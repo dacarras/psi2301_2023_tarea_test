@@ -1,0 +1,213 @@
+---
+title: "Tarea test"
+author: "correo@autor.cl"
+output:
+     html_document
+---
+
+---
+
+# Comandos básicos de un reporte `rmd`
+
+---
+
+# Este es un titulo.
+
+## Este es un subtitulo.
+
+### Este es un subtitulo de una sección
+
+Este es un texto.
+
+- Este es un texto como bullet.
+- Este es un texto como *bullet*, empleando cursiva.
+- Este es un texto como **bullet**, empleando negrita.
+
+>Este es texto como cita.
+
+```
+# este es un texto dentro de un chunk de código, sin código indicado.
+```
+
+```{r}
+
+texto_en_codigo <- 'este es un texto dentro de un código'
+
+```
+
+Este es un texto, que incluye un objeto definido en un código: **`r texto_en_codigo`.**
+
+---
+
+# Abrir datos
+
+
+```{r}
+
+# data location
+url_location <- url('https://github.com/dacarras/psi2301_2023_tarea_test/raw/main/ingresos_2016.rds')
+
+# read data in rds format
+data_inc <- readRDS(url_location)
+
+```
+
+# Inspeccionar datos
+
+- Inserte el código para abrir una vista previa de su base de datos
+
+```{r}
+
+# inspect data
+dplyr::glimpse(data_inc)
+
+```
+
+# Preparar datos
+
+- Inserte el código para abrir una vista previa de su base de datos
+
+```{r}
+
+# -------------------------------------
+# variables de los datos
+# -------------------------------------
+
+# hinc = 'ingreso per capita del hogar 1k',
+# sex  = 'sexo del participante (0=hombre, 1=mujer)',
+# edu  = 'años de escolaridad',
+# home_n  = 'cantidad de personas que vive en el hogar'
+
+# -------------------------------------
+# escolaridad original
+# -------------------------------------
+
+library(dplyr)
+dplyr::count(data_inc, edu) %>%
+knitr::kable()
+
+# -------------------------------------
+# sacar valores no válidos
+# -------------------------------------
+
+data_model <- data_inc %>%
+              mutate(year_edu = as.numeric(na_if(edu,- 88)))
+
+# -------------------------------------
+# tabla para revisar
+# -------------------------------------
+
+data_model %>%
+dplyr::count(edu, year_edu) %>%
+knitr::kable()
+
+```
+
+
+# Visualización de datos
+
+
+```{r}
+
+# -------------------------------------
+# histograma
+# -------------------------------------
+
+# histograma con titulos y labels
+hist(data_model$hinc, 
+  main = 'Histograma de ingresos de hogares',
+  xlab  = 'Ingresos en miles')
+
+# -------------------------------------
+# correlacion
+# -------------------------------------
+
+data_model %>%
+dplyr::select(hinc, year_edu) %>%
+na.omit() %>%
+cor()
+
+# -------------------------------------
+# dispersiograma
+# -------------------------------------
+
+with(data_model, plot(x = year_edu, y = hinc))
+
+# -------------------------------------
+# boxplot por años de escolaridad
+# -------------------------------------
+
+boxplot(hinc ~ year_edu, data = data_model)
+
+
+```
+
+# Descriptivos
+
+```{r}
+
+# -------------------------------------
+# medidas de tendencia central
+# -------------------------------------
+
+# función para obtener moda
+mode <- function(v) {
+   uniqv <- unique(v)
+   uniqv[which.max(tabulate(match(v, uniqv)))]
+# source: https://www.tutorialspoint.com/r/r_mean_median_mode.htm
+}
+
+
+# tabla descriptiva
+data_model %>%
+summarize(
+moda    = mode(hinc),
+mediana = median(hinc, na.rm = TRUE),
+media   = mean(hinc, na.rm = TRUE)
+) %>%
+knitr::kable(., digits = 2)
+
+# valor mediana
+valor_mediana <- median(data_model$hinc, na.rm = TRUE)
+
+# -------------------------------------
+# medidas de posición
+# -------------------------------------
+
+data_model %>%
+summarize(
+percentil_25 = quantile(hinc, probs = .25, na.rm = TRUE),
+percentil_50 = quantile(hinc, probs = .50, na.rm = TRUE),
+percentil_75 = quantile(hinc, probs = .75, na.rm = TRUE)
+) %>%
+knitr::kable(., digits = 2)
+
+
+# -------------------------------------
+# medidas de variabilidad
+# -------------------------------------
+
+data_model %>%
+summarize(
+minimo = min(hinc, na.rm = TRUE),
+maximo = max(hinc, na.rm = TRUE),
+percentil_25 = quantile(hinc, probs = .25, na.rm = TRUE),
+percentil_75 = quantile(hinc, probs = .75, na.rm = TRUE),
+desviacion_estandar = sd(hinc, na.rm = TRUE)
+) %>%
+mutate(rango = maximo - minimo) %>%
+mutate(rango_intercuartil = percentil_75 - percentil_25) %>%
+knitr::kable(., digits = 2)
+
+
+```
+
+# Resumen
+
+- La distribución de ingresos de los hogares es muy asimetrica.
+- Presenta una asimetría positiva, donde los ingresos más altos se concentran en muy pocos hogares.
+- Debido a que la distribucion de ingresos es muy asimétrica, la media de la distribución es poco informativa.
+- La mediana de ingresos es de **`r valor_mediana`** mil pesos.
+- Un 75% de los hogares presenta ingresos menores a 580 mil pesos mensuales.
+
+
