@@ -402,10 +402,10 @@ datos</li>
 dplyr::glimpse(data_inc)</code></pre>
 <pre><code>## Rows: 1,120
 ## Columns: 4
-## $ hinc   [3m[38;5;246m&lt;dbl&gt;[39m[23m 128.00000, 511.87225, 731.02267, 471.20375, 819.23280, 444.6939…
-## $ sex    [3m[38;5;246m&lt;dbl&gt;[39m[23m 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, …
-## $ edu    [3m[38;5;246m&lt;dbl+lbl&gt;[39m[23m  8, 11, 15, 12, 11, 14, 12, 18, 12,  7, 12, 17,  0,  3, 12,…
-## $ home_n [3m[38;5;246m&lt;dbl&gt;[39m[23m 5, 4, 3, 4, 4, 4, 4, 4, 4, 3, 4, 2, 4, 3, 2, 6, 12, 3, 2, 5, 2,…</code></pre>
+## $ hinc   &lt;dbl&gt; 128.00000, 511.87225, 731.02267, 471.20375, 819.23280, 444.6939…
+## $ sex    &lt;dbl&gt; 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, …
+## $ edu    &lt;dbl+lbl&gt;  8, 11, 15, 12, 11, 14, 12, 18, 12,  7, 12, 17,  0,  3, 12,…
+## $ home_n &lt;dbl&gt; 5, 4, 3, 4, 4, 4, 4, 4, 4, 3, 4, 2, 4, 3, 2, 6, 12, 3, 2, 5, 2,…</code></pre>
 </div>
 <div id="preparar-datos" class="section level1">
 <h1>Preparar datos</h1>
@@ -536,7 +536,7 @@ knitr::kable()</code></pre>
 # -------------------------------------
 
 data_model &lt;- data_inc %&gt;%
-              mutate(year_edu = as.numeric(na_if(edu,- 88)))
+              mutate(year_edu = (na_if(as.vector(edu),- 88)))
 
 # -------------------------------------
 # tabla para revisar

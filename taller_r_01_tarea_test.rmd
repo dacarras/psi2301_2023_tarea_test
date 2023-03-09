@@ -91,7 +91,7 @@ knitr::kable()
 # -------------------------------------
 
 data_model <- data_inc %>%
-              mutate(year_edu = as.numeric(na_if(edu,- 88)))
+              mutate(year_edu = (na_if(as.vector(edu),- 88)))
 
 # -------------------------------------
 # tabla para revisar
